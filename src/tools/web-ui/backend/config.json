@@ -1,0 +1,43 @@
+{
+  "use_container": false,
+  "container_cmd": "containers/run-docker-example.sh",
+  "distributed_workers_list": ["localhost:50001", "localhost:50002", "localhost:50003", "localhost:50004", "localhost:50005", "localhost:50006"],
+  "max_cpus": 12,
+  "paths": {
+    "daphne_dir": "/path/to/daphne",
+    "stdout_file": "logs/out.txt",
+    "stderr_file": "logs/err.txt"
+  },
+  "algorithms": {
+    "algorithm_list":[
+      {
+        "name": "Hello World",
+        "filepath": "scripts/examples/hello-world.daph",
+        "arguments": []
+      },
+      {
+        "name": "Connected Components",
+        "filepath": "scripts/algorithms/components.daph",
+        "arguments": [
+          {
+            "name": "Small - Amazon",
+            "arguments": "n=60 e=10 C=\"out.txt\""
+          },
+          {
+            "name": "Medium - Amazon",
+            "arguments": "n=200 e=50 C=\"out.txt\""
+          }
+        ]
+      }
+    ]
+  },
+  "vega_config": {
+    "host": "login.vega.izum.si",
+    "port": 22,
+    "username": "username",
+    "private_key_path": "/path/to/rsa/vega",
+    "daphne_dir": "/path/to/daphne",
+    "stdout_file": "out.txt",
+    "stderr_file": "err.txt"
+  }
+}
