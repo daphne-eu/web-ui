@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ExecutionMode } from '../experiments/hetero-hardware/hetero-hardware.component';
 import { Cluster } from '../experiments/hetero-hardware/hetero-hardware.component';
 import { DistributedBackend } from 'src/app/core/models/distributed-backend';
 import { ConfigService } from 'src/app/core/services/config.service';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-daphne-execution',
@@ -52,25 +52,23 @@ export class DaphneExecutionComponent {
   show_error_message = false;
   error_message = "";
 
-  constructor(private http: HttpClient, private configService: ConfigService) {
+  constructor(private dataService: DataService, private configService: ConfigService) {
     this.apiUrl = this.configService.apiUrl;
     this.killDaphne();
 
     // Fetch possible scripts/algorithms
-    this.http.get(`${this.apiUrl}/api/get_setup_settings`).subscribe({
+    this.dataService.getAlgorithms().subscribe({
       next: (res: any) => {
-        if (res.success) {
-          this.Algorithms = res.message.algorithm_list
-          this.selectedAlgorithm = res.message.algorithm_list[0]
-          this.inputSize = res.message.algorithm_list[0].arguments[0]?.arguments ?? "";
-          this.maxLocalCores = parseInt(res.message.max_cpus)
-          this.maxLocalNumberNodes = res.message.max_distributed_workers
+        this.Algorithms = res.algorithm_list
+        this.selectedAlgorithm = res.algorithm_list[0]
+        this.inputSize = res.algorithm_list[0].arguments[0]?.arguments ?? "";
+        this.maxLocalCores = parseInt(res.max_cpus)
+        this.maxLocalNumberNodes = res.max_distributed_workers
 
-          this.maxCores = this.maxLocalCores;
-          this.maxNumberNodes = this.maxLocalNumberNodes;
-        }
+        this.maxCores = this.maxLocalCores;
+        this.maxNumberNodes = this.maxLocalNumberNodes;        
       },
-      error: () => console.log(this)
+      error: (err) => this.displayError(err)
     });
   }
 
@@ -112,26 +110,20 @@ export class DaphneExecutionComponent {
     // Set flag
     this.running_daphne = true
     // Make a POST request to the API with the payload
-    this.http.post(`${this.apiUrl}/api/run_daphne`, payload)
-      .subscribe({
+    this.dataService.runDaphne(payload).subscribe({
         next: (res: any) => {
-          if (!res.success) {            
-            this.killDaphne();
-            this.running_daphne = false;
-            this.error_message = res.message
-            this.show_error_message = true;
-            setTimeout(() => {
-              this.show_error_message = false;
-            }, 3000);
-          }
           this.getResults();
         },
-        error: () => console.log(this)
+        error: (err) => {
+          this.killDaphne();
+          this.running_daphne = false;
+          this.displayError(err)
+        }
       });
   }
 
   getResults() {
-    this.http.get(`${this.apiUrl}/api/get_output`).subscribe({
+    this.dataService.getOutput().subscribe({
       next: (res: any) => {
         if (!this.running_daphne){
           // Return recursively
@@ -150,22 +142,22 @@ export class DaphneExecutionComponent {
 
         // If we reach this point.. we still need to fetch data, call recursively, after 1s
         setTimeout(() => this.getResults(), 1000);
-      }
+      }, 
+      error: (err) => this.displayError(err)
     })
     // }, 500);
   }
 
   killDaphne(){
-    this.http.post(`${this.apiUrl}/api/kill_daphne`, null).subscribe({
+    this.dataService.killDaphne().subscribe({
       next: (res: any) => {
         this.running_daphne = false;
-        if (res.success) {
-          this.show_canceled_alert = true;
-          setTimeout(() => {
-            this.show_canceled_alert = false;
-          }, 3000);
-        }
-      }
+        this.show_canceled_alert = true;
+        setTimeout(() => {
+          this.show_canceled_alert = false;
+        }, 3000);        
+      }, 
+      error: (err) => this.displayError(err)
     })
   }
   updateLimits() {
@@ -181,5 +173,13 @@ export class DaphneExecutionComponent {
   onChange(newAlgorithm: any) {
     this.selectedAlgorithm = newAlgorithm;
     this.inputSize = newAlgorithm.arguments[0]?.arguments ?? "";
+  }
+
+  private displayError(err: Error){
+    this.error_message = err.message
+    this.show_error_message = true;
+    setTimeout(() => {
+      this.show_error_message = false;
+    }, 3000);
   }
 }

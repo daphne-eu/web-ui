@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Algorithm } from 'src/app/core/models/algorithm';
 import { Cluster } from '../hetero-hardware/hetero-hardware.component';
 import { DistributedBackend } from 'src/app/core/models/distributed-backend';
 import { ExecutionMode } from '../hetero-hardware/hetero-hardware.component';
 import { ConfigService } from 'src/app/core/services/config.service';
+import { DataService } from 'src/app/core/services/data.service';
 
 @Component({
   selector: 'app-communication',
@@ -36,7 +36,7 @@ export class CommunicationComponent {
   show_success_alert = false;
   show_canceled_alert = false;
 
-  constructor(private http: HttpClient, private configService: ConfigService) {
+  constructor(private dataService: DataService, private configService: ConfigService) {
     this.apiUrl = configService.apiUrl;
     this.killDaphne();
   }
@@ -69,24 +69,22 @@ export class CommunicationComponent {
     // Set flag
     this.running_daphne = true
     // Make a POST request to the API with the payload
-    this.http.post(`${this.apiUrl}/api/run_daphne`, payload)
+    this.dataService.runDaphne(payload)
       .subscribe({
         next: (res: any) => {
-          if (!res.success) {
-            this.killDaphne();
-            this.running_daphne = false;
-            throw new Error(JSON.stringify(res));
-          }
-
           this.getResults();
         },
-        error: () => console.log(this)
+        error: (err) => {          
+          this.killDaphne();
+          this.running_daphne = false;
+          console.log(err);
+        }
       });
   }
 
   getResults() {
     var resultInterval = setInterval(() => {
-    this.http.get(`${this.apiUrl}/api/get_output`).subscribe({
+    this.dataService.getOutput().subscribe({
       next: (res: any) => {
         if (!this.running_daphne){
           clearInterval(resultInterval);
@@ -103,24 +101,24 @@ export class CommunicationComponent {
         }
         this.result_output = res.output.output
         this.agg_statistics = res.output.aggregate_statistics;
-      }
+      },
+      error: (err) => console.log(err)
     })
     }, 500);
   }
 
   killDaphne(){
-    this.http.post(`${this.apiUrl}/api/kill_daphne`, null).subscribe({
+    this.dataService.killDaphne().subscribe({
       next: (res: any) => {
-        console.log(res)
-        this.running_daphne = false;
-        if (res.success) {
-          if (res.message === "Deployment killed."){
-            this.show_canceled_alert = true;
-            setTimeout(() => {
-              this.show_canceled_alert = false;
-            }, 3000);
-          }
-        }
+        this.running_daphne = false;        
+        if (res === "Deployment killed."){
+          this.show_canceled_alert = true;
+          setTimeout(() => {
+            this.show_canceled_alert = false;
+          }, 3000);
+        }        
+      }, error: (err) => {
+        console.log(err)
       }
     })
   }

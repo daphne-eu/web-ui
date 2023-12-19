@@ -23,10 +23,10 @@ def startWorkers(numberOfWorkers):
     sleep(1) # wait for workers to spawn 
     return workers
 
-def killAllWorkers(worker_list):
+def killAllWorkers(config):
     proc = subprocess.Popen(
-        ['bash', '{}/deploy/deployDistributed.sh'.format(current_app.config["config"]["paths"]["daphne_dir"]),
-        '--kill', '--peers', worker_list
+        ['bash', '{}/deploy/deployDistributed.sh'.format(config["paths"]["daphne_dir"]),
+        '--kill', '--peers', ','.join(config["distributed_workers_list"])
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 def getValueFromParams(parameter, daphneParams):

@@ -60,14 +60,14 @@ class LocalDeployment():
             out_f.write("\n")
             self.process = subprocess.Popen(cmd, cwd=current_app.config["config"]["paths"]["daphne_dir"], stdout=out_f, stderr=err_f, env=my_env)
             if self.executionMode == "distributed" and "gRPC" in backendFlag:
-                self.terminateWorkers(workers)
+                self.terminateWorkers(current_app.config["config"])
             return 
         
-    def terminateWorkers(self, worker_list):
+    def terminateWorkers(self, config):
         if self.process is not None:
             self.process.wait()
-        utils.killAllWorkers(worker_list)
+        utils.killAllWorkers(config)
     
     def kill(self):
-        self.terminateWorkers([current_app.config["config"]["distributed_workers_list"]])
+        Thread(target=self.terminateWorkers, args=[current_app.config["config"]]).start()
         self.process.kill()

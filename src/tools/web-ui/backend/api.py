@@ -56,7 +56,7 @@ def get_output():
     ret["output"] = ""
     if deployment is not None:
         ret["output"] = deployment.getOutput()
-    return jsonify(success=True, running=getStatus(), output=ret)    
+    return jsonify(success=True, message={"running": getStatus(), "output": ret})
 
 @api_bp.route('/kill_daphne', methods=['POST'])
 def kill_script():
