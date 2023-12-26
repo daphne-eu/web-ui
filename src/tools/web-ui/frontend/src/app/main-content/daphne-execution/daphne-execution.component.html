@@ -91,14 +91,40 @@
                                 </div>
                             </div>
                         </div>    
-                        <div class="mt-4 row" *ngIf="vectorization">
+                        <!-- Vectorization settings -->
+                        <ng-container *ngIf="vectorization">
+                        <div class="mt-4 row" >
                             <div class="col d-flex" >
                                 <label for="customRange" class="form-label">Number of cores:</label>
                                 <input type="range" class="form-range custom-range mx-2" min="2" [max]="maxCores" step="1"
                                     id="customRange" value="2"  [(ngModel)]="coresPerNode" name="coresPerNode">
                                     {{ coresPerNode }}
                             </div>
-                        </div>                
+                        </div>
+                        <div class="mt-1 row" >
+                            <div class="col-auto d-flex m-1" >
+                                <label for="partitioning" class="form-label">Partitioning:</label>
+                                <select class="form-select" name="partitioning" aria-label="partitioning" [(ngModel)]="partitioning" 
+                                ng-options>
+                                    <option *ngFor="let partitioning of partitioning_options" [ngValue]="partitioning.flag" [title]="partitioning.description">{{partitioning.flag.split("=")[1]}}</option>
+                                </select>
+                            </div>
+                            <div class="col-auto d-flex m-1" >
+                                <label for="queue_layout" class="form-label">Queue layout:</label>
+                                <select class="form-select" name="queue_layout" aria-label="queue_layout" [(ngModel)]="queue_layout" 
+                                ng-options>
+                                    <option *ngFor="let layout of queue_layout_options" [ngValue]="layout.flag" [title]="layout.description">{{layout.flag.split("=")[1]}}</option>
+                                </select>
+                            </div>
+                            <div class="col-auto d-flex m-1" >
+                                <label for="victim_selection" class="form-label">Victim Selection:</label>
+                                <select class="form-select" name="victim_selection" aria-label="victim_selection" [(ngModel)]="victim_selection"
+                                ng-options>
+                                    <option *ngFor="let victim_selection of victim_selection_options" [ngValue]="victim_selection.flag" [title]="victim_selection.description">{{victim_selection.flag.split("=")[1]}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        </ng-container>
                         <div class="mt-4 row">
                             <div class="col">
                                 <label class="col col-form-label">Select execution algorithm:</label>

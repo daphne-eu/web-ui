@@ -21,6 +21,11 @@ export class DaphneExecutionComponent {
   // Var for selected output
   selected_output_panel = "output-panel";
 
+  // Scheduling
+  partitioning_options: any[] = [];
+  queue_layout_options: any[] = [];
+  victim_selection_options: any[] = [];
+   
   // Max limits
   maxCores = 2;
   maxNumberNodes = 1;
@@ -33,6 +38,9 @@ export class DaphneExecutionComponent {
   numberOfNodes: number = 2;
   coresPerNode: number = 2;
   vectorization: boolean = false;
+  partitioning: string = "";
+  queue_layout: string = "";
+  victim_selection: string = "";
   select_matrix_repr: boolean = false;
   dist_backend: DistributedBackend = DistributedBackend.mpi;
   use_cuda: boolean = false;
@@ -57,16 +65,20 @@ export class DaphneExecutionComponent {
     this.killDaphne();
 
     // Fetch possible scripts/algorithms
-    this.dataService.getAlgorithms().subscribe({
+    this.dataService.getSetupSettings().subscribe({
       next: (res: any) => {
         this.Algorithms = res.algorithm_list
         this.selectedAlgorithm = res.algorithm_list[0]
         this.inputSize = res.algorithm_list[0].arguments[0]?.arguments ?? "";
-        this.maxLocalCores = parseInt(res.max_cpus)
+        this.maxLocalCores = parseInt(res.daphne_options.max_cpus)
         this.maxLocalNumberNodes = res.max_distributed_workers
 
         this.maxCores = this.maxLocalCores;
         this.maxNumberNodes = this.maxLocalNumberNodes;        
+
+        this.partitioning_options = res.daphne_options.partitioning
+        this.queue_layout_options = res.daphne_options.queue_layout
+        this.victim_selection_options = res.daphne_options.victim_selection
       },
       error: (err) => this.displayError(err)
     });
@@ -105,6 +117,13 @@ export class DaphneExecutionComponent {
       payload.daphne_params.push("--select-matrix-repr")
     payload.daphne_args += this.selectedAlgorithm.filepath + " " + this.inputSize
     
+    // Scheduling knobs
+    if (this.partitioning)
+        payload.daphne_params.push(this.partitioning)
+      if (this.queue_layout)
+        payload.daphne_params.push(this.queue_layout)
+      if (this.victim_selection)
+        payload.daphne_params.push(this.victim_selection)
     // Clear output
     this.result_output = "";
     // Set flag

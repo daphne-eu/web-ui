@@ -34,7 +34,7 @@ export class DataService {
     )
   }
 
-  getAlgorithms() {
+  getSetupSettings() {
     return this.http.get(`${this.apiUrl}/api/get_setup_settings`).pipe(
       catchError(this.handleError),
       map(this.isSuccessful)

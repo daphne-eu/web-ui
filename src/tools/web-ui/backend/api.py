@@ -71,6 +71,6 @@ def kill_script():
 def get_algorithms():
     res = {}
     res["algorithm_list"] = current_app.config["config"]["algorithms"]["algorithm_list"]
-    res["max_cpus"] = current_app.config["config"]["max_cpus"]
+    res["daphne_options"] = current_app.config["config"]["daphne_options"]
     res["max_distributed_workers"] = len(current_app.config["config"]["distributed_workers_list"])
     return jsonify(success=True, message=res)
