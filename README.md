@@ -16,7 +16,7 @@ limitations under the License.
 
 # Daphne UI
 
-This tool is used as a web interface for running DAPHNE either locally or at VEGA HPC. 
+This tool is used as a web interface for running [DAPHNE](https://github.com/daphne-eu/daphne) either locally or at VEGA HPC. 
 
 **Note that DAPHNE must be already build and ready to run before using the Web UI.**
 
@@ -37,13 +37,13 @@ The tool consists of a Python Flask API server (the [backend](backend/)) which s
 
 ## Web-UI
 
-The frontend is built using Angular Framework. You can read more about how to run the angular app [here](frontendEADME.md). During development the frontend can be served by a seperate node server (using `ng serve`).
+The frontend is built using Angular Framework. You can read more about how to run the angular app [here](frontend/README.md). During development the frontend can be served by a seperate node server (using `ng serve`).
 
 ## API
 
-The Flask API server controls DAPHNE jobs and responds with outputs/errors to the frontend. You can read more on how to run the backend API [here](backendEADME.md).
+The Flask API server controls DAPHNE jobs and responds with outputs/errors to the frontend. You can read more on how to run the backend API [here](backend/README.md).
 
 ## Configuration
 
-[./backend/config.json](backendonfig.json) needs to be configured in order to use the UI. 
-Read more [here](backendEADME.md#Configuration)
+[./backend/config.json](backend/config.json) needs to be configured in order to use the UI. 
+Read more [here](./backend/README.md#configuration)
