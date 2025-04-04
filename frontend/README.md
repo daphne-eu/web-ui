@@ -1,3 +1,19 @@
+<!--
+Copyright 2023 The DAPHNE Consortium
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
 # DaphneUI
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.6.
@@ -11,7 +27,7 @@ npm install -g @angular/cli
 
 ## Configuration
 
-Before running the UI you might also have to configure the API endpoint at [`./src/app/core/services/config.service.ts`](./src/app/core/services/config.service.ts)
+Before running the UI you might also have to configure the API endpoint at [`./src/app/core/services/config.service.ts`](src/app/core/services/config.service.ts)
 
 ## Development server
 
